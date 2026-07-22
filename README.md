@@ -3,14 +3,14 @@ Docker Learning
 
 ## Overview
 
-In this project I was tasked with making a multi-container application focused on hands-on containerisation and orchestration with Docker and Docker compose.
+This project is a multi-container application built as part of the CoderCo Containers Challenge, focused on containerisation and orchestration using Docker and Docker Compose.
 
 The application consists of a Flask web app with two routes:
 
 - a welcome page (`/`)
 - a visit counter (`/count`)
 
-Backed by Redis, which stores and persists the visit count. An Nginx reverse proxy sits in front of multiple scaled Flask instances load balancing incoming traffic across them.
+Backed by Redis, which stores and persists the visit count. An Nginx reverse proxy sits in front of multiple scaled Flask instances, load balancing incoming traffic across them.
 
 ## Technologies Used
 
@@ -31,11 +31,11 @@ Started by writing `appv2.py` with two routes:
 
 Before containerising anything, I ran the app locally with `python3 appv2.py` to confirm the routes worked as expected.
 
-![Flask app code](./screenshots/flask-app-code.png)
+![Flask app code](app_challenge/screenshots/flask-app-code.png)
 
-![Flask running locally in terminal](./screenshots/flask-local-terminal.png)
+![Flask running locally in terminal](app_challenge/screenshots/flask-local-terminal.png)
 
-![Flask welcome page in browser](./screenshots/flask-local-browser.png)
+![Flask welcome page in browser](app_challenge/screenshots/flask-local-browser.png)
 
 ### Dockerising Flask
 
@@ -75,7 +75,7 @@ docker-compose up --build
 
 ### Persistent Storage for Redis
 
-By default Redis data only exists for the lifetime of the container, restarting or rebuilding wipes the visit count. To fix this I added a named Docker volume in `docker-compose.yml` mounting it to `/data` inside the Redis container:
+By default, Redis data only exists for the lifetime of the container, restarting or rebuilding wipes the visit count. To fix this, I added a named Docker volume in `docker-compose.yml`, mounting it to `/data` inside the Redis container:
 
 ```yaml
 redis:
@@ -89,7 +89,7 @@ volumes:
   redis-data:
 ```
 
-![Redis volume configuration in docker-compose.yml](./screenshots/redis-volume-config.png)
+![Redis volume configuration in docker-compose.yml](app_challenge/screenshots/redis-volume-config.png)
 
 This moves Redis's storage outside the container, so Docker manages it independently and the visit count survives container restarts and rebuilds.
 
@@ -121,7 +121,7 @@ To test scaling, I ran multiple instances of the Flask app:
 docker-compose up --scale web=3 --build
 ```
 
-Since only one container can bind to a host port at a time, running multiple Flask instances directly wasn't possible without a conflict so I introduced Nginx as a reverse proxy in front of the Flask service listening on port 5003 and distributing incoming requests across all three Flask containers. Port exposure was removed from the Flask service entirely and moved to Nginx instead, so all external traffic enters through Nginx.
+Since only one container can bind to a host port at a time, running multiple Flask instances directly wasn't possible without a conflict. Nginx was introduced as a reverse proxy in front of the Flask service, listening on port 5003 and distributing incoming requests across all three Flask containers. Port exposure was removed from the Flask service entirely and moved to Nginx instead, so all external traffic enters through Nginx.
 
 After scaling, `docker-compose up --scale web=3 --build` successfully created:
 
@@ -131,9 +131,9 @@ After scaling, `docker-compose up --scale web=3 --build` successfully created:
 
 With Nginx routing traffic across all three Flask instances.
 
-![Nginx service configuration in docker-compose.yml](./screenshots/nginx-compose-config.png)
+![Nginx service configuration in docker-compose.yml](app_challenge/screenshots/nginx-compose-config.png)
 
-![Visit counter working through Nginx](./screenshots/visit-counter-result.png)
+![Visit counter working through Nginx](app_challenge/screenshots/visit-counter-result.png)
 
 ## Project Structure
 
